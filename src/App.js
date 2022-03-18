@@ -3,7 +3,7 @@ import { useEffect, useState } from 'react';
 
 import { initializeApp } from "firebase/app";
 import { getAnalytics } from "firebase/analytics";
-import { collection, getDocs, getFirestore, query } from "firebase/firestore"
+import { collection, getDocs, getFirestore } from "firebase/firestore"
 
 import Scene from "./scene.js"
 
@@ -37,13 +37,13 @@ function App() {
   async function getScenes(db) {
     const scenesCollection = collection(db, 'scenes');
     const scenesSnapshot = await getDocs(scenesCollection);
-    const scenesList = scenesSnapshot.docs.map(doc => doc.data());
+    const scenesList = scenesSnapshot.docs.map(doc => {return {id: doc.id, data: doc.data()}});
     setScenes(scenesList);
   }
 
   return (
     <div className="App">
-      <Scene title={scenes.length > 0 ? scenes[0].title : 'loading...'} img={scenes.length > 0 ? scenes[0].img : null}/>
+      <Scene data={scenes.length > 0 ? scenes[0].data : null} id={scenes.length > 0 ? scenes[0].id : null} db={db}/>
     </div>
   );
 }
