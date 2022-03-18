@@ -25,8 +25,6 @@ function App() {
   const analytics = getAnalytics(app);
 
   const db = getFirestore(app);
-  console.log(db);
-
 
   const [scenes, setScenes] = useState([]);
 
@@ -45,7 +43,7 @@ function App() {
 
   return (
     <div className="App">
-      <Scene title={scenes.length > 0 ? scenes[0].title : 'loading...'}/>
+      <Scene title={scenes.length > 0 ? scenes[0].title : 'loading...'} img={scenes.length > 0 ? scenes[0].img : null}/>
     </div>
   );
 }
