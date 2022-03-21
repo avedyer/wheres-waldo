@@ -1,11 +1,14 @@
-import './App.css';
 import { useEffect, useState } from 'react';
+import { Routes, Route, BrowserRouter } from "react-router-dom";
 
 import { initializeApp } from "firebase/app";
 import { getAnalytics } from "firebase/analytics";
 import { collection, getDocs, getFirestore } from "firebase/firestore"
 
 import Scene from "./scene.js"
+import Home from './home.js'
+import './App.css';
+import Leaderboard from './leaderboard.js';
 
 
 const firebaseConfig = {
@@ -18,34 +21,36 @@ const firebaseConfig = {
   measurementId: "G-TV7XMG45MQ"
 };
 
+// Initialize Firebase
+const app = initializeApp(firebaseConfig);
+const analytics = getAnalytics(app);
+
+const db = getFirestore(app);
+
 function App() {
 
-  // Initialize Firebase
-  const app = initializeApp(firebaseConfig);
-  const analytics = getAnalytics(app);
 
-  const db = getFirestore(app);
+  return(
+    <div className='App'>
+      <BrowserRouter>
+        <Routes>
+          <Route path='/' element={<Home db={db}/>}/>
+          <Route path='/leaderboard' element={<Leaderboard />} />
+          <Route exact path='/scene/:id' element={<Scene />}/>
+        </Routes>
+      </BrowserRouter>
+    </div>
+  )
 
-  const [scenes, setScenes] = useState([]);
-
-  useEffect(() => {
-    if (scenes.length === 0) {
-      getScenes(db);
-    }
-  }, []);
-
-  async function getScenes(db) {
-    const scenesCollection = collection(db, 'scenes');
-    const scenesSnapshot = await getDocs(scenesCollection);
-    const scenesList = scenesSnapshot.docs.map(doc => {return {id: doc.id, data: doc.data()}});
-    setScenes(scenesList);
-  }
-
+  /*
   return (
     <div className="App">
-      <Scene data={scenes.length > 0 ? scenes[0].data : null} id={scenes.length > 0 ? scenes[0].id : null} db={db}/>
+      {scenes.map((scene) => 
+        <Scene data={scenes.length > 0 ? scene.data : null} id={scenes.length > 0 ? scene.id : null} db={db}/>
+      )}
     </div>
   );
+  */
 }
 
-export default App;
+export { db, App }

@@ -1,26 +1,32 @@
 import { collection, doc, getDoc, getDocs, query, setDoc, where } from "firebase/firestore"
+import { useParams } from 'react-router-dom'
+import { useLocation } from "react-router-dom";
+import { useEffect, useState } from 'react';
+import { db } from './App.js'
+
 
 function Scene(props) {
-  async function writeLocation(e) {
-    let offsetX = e.target.offsetLeft;
-    let offsetY = e.target.offsetTop;
-    let coords = [e.clientX - offsetX, e.clientY - offsetY];
 
-    const sceneRef = doc(props.db, 'scenes', props.id)
-    const sceneData = await getDoc(sceneRef)
-    
-    let name = prompt('name?');
-    
-    await setDoc(doc(sceneRef, 'locations', name), {
-      name: `${name}`,
-      coords: `${coords}`
-    });
+  const [scene, setScene] = useState();
+
+  useEffect(() => {
+    if (!scene) {
+      getScene(id);
+    }
+  }, []);
+
+  const id = window.location.pathname.split('/').slice(-1)[0];
+
+  async function getScene(id) {
+    const docRef = doc(db, 'scenes', id);
+    const sceneSnapshot = await getDoc(docRef);
+    setScene(sceneSnapshot.data())
   }
 
   return (
     <div className="scene">
-      <h1>{props.data ? props.data.title : 'loading...'}</h1>
-      <img src={props.data ? props.data.img : null} onClick={writeLocation}></img>
+      <h1>{scene ? scene.title : 'loading...'}</h1>
+      <img src={scene ? scene.img : null}></img>
     </div>
   )
 }
