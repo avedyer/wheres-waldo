@@ -8,6 +8,9 @@ function Scene(props) {
 
   const [scene, setScene] = useState();
   const [locations, setLocations] = useState([]);
+  const [finds, setFinds] = useState([]);
+  const [seconds, setSeconds] = useState(0);
+  const [isActive, setIsActive] = useState(true);
 
   useEffect(() => {
     if (!scene) {
@@ -17,6 +20,20 @@ function Scene(props) {
       }
     }
   }, []);
+
+  useEffect(() => {
+    let interval = null;
+    if (isActive) {
+      interval = setInterval(() => {
+        setSeconds(seconds => seconds + 1);
+      }, 1000);
+    } 
+    else if (!isActive && seconds !== 0) {
+      clearInterval(interval);
+    }
+    
+    return () => clearInterval(interval);
+  }, [isActive, seconds])
 
   function placeGuess(e) {
 
@@ -32,9 +49,14 @@ function Scene(props) {
 
     for (let location of locations) {
       if (location.name === name) {
-        console.log(location.coords)
         if (Math.abs(coords[0] - location.coords[0]) < 30) {
-          console.log('correct!');
+          console.log('correct');
+          if (!finds.includes(name)) {
+            setFinds([...finds, name]);
+            if (checkWin()) {
+              //enterScore();
+            }
+          }
         }
         else {
           console.log('incorrect');
@@ -43,6 +65,16 @@ function Scene(props) {
     }
   }
 
+  function checkWin() {
+    if (locations.length === finds.length) {
+      return true;
+    }
+    return false
+  }
+
+  
+  const start = new Date()
+  console.log(start)
   const id = window.location.pathname.split('/').slice(-1)[0];
 
   async function getScene(id) {
@@ -62,6 +94,7 @@ function Scene(props) {
   return (
     <div className="scene">
       <h1>{scene ? scene.title : 'loading...'}</h1>
+      <h3>{seconds}</h3>
       <img src={scene ? scene.img : null} onClick={placeGuess}></img>
     </div>
   )
