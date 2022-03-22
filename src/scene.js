@@ -1,4 +1,4 @@
-import { collection, doc, getDoc, getDocs, query, setDoc, where } from "firebase/firestore"
+import { collection, doc, getDoc, getDocs } from "firebase/firestore"
 import { useEffect, useState } from 'react';
 import { db } from './App.js'
 
@@ -19,8 +19,28 @@ function Scene(props) {
   }, []);
 
   function placeGuess(e) {
-    console.log(e.target)
-    console.log(locations)
+
+    if (!locations) {
+      return
+    }
+
+    let offsetX = e.target.offsetLeft - window.scrollX;
+    let offsetY = e.target.offsetTop - window.scrollY;
+
+    let coords = [Math.floor(e.clientX - offsetX), Math.floor(e.clientY - offsetY)]
+    let name = prompt('name?');
+
+    for (let location of locations) {
+      if (location.name === name) {
+        console.log(location.coords)
+        if (Math.abs(coords[0] - location.coords[0]) < 30) {
+          console.log('correct!');
+        }
+        else {
+          console.log('incorrect');
+        }
+      }
+    }
   }
 
   const id = window.location.pathname.split('/').slice(-1)[0];
