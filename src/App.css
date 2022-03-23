@@ -6,3 +6,12 @@
 .found{
   opacity: 60%;
 }
+
+#scene {
+  position: relative;
+}
+
+.character-form {
+  position: absolute;
+  background-color: red;
+}

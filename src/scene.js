@@ -6,6 +6,7 @@ import waldo from './imgs/waldo.jpg'
 import wenda from './imgs/wenda.jpg'
 import odlaw from './imgs/odlaw.jpg'
 import wizard from './imgs/wizard.gif'
+import CharacterForm from "./characterForm.js";
 
 function Scene() {
   const [scene, setScene] = useState();
@@ -13,6 +14,8 @@ function Scene() {
   const [finds, setFinds] = useState([]);
   const [time, setTime] = useState(0);
   const [isActive, setIsActive] = useState(false);
+  const [guessing, setIsGuessing] = useState(false)
+  const [coords, setCoords] = useState([])
 
   const icons = [
     {name: 'Waldo', src: waldo},
@@ -58,11 +61,19 @@ function Scene() {
     }
   }, [finds])
 
+  function clickCoords(e) {
+    return [e.clientX, e.clientY];
+  }
+
   function placeGuess(e) {
 
     if (!locations) {
       return
     }
+
+    setIsGuessing(true);
+
+    setCoords([e.clientX, e.clientY])
 
     let offsetX = e.target.offsetLeft - window.scrollX;
     let offsetY = e.target.offsetTop - window.scrollY;
@@ -83,6 +94,7 @@ function Scene() {
         }
       }
     }
+    setIsGuessing(false)
   }
 
   function checkWin() {
@@ -131,7 +143,7 @@ function Scene() {
   }
 
   return (
-    <div className="scene">
+    <div id="scene">
       <h1>{scene ? scene.title : 'loading...'}</h1>
       <h3>{clockTime(time)}</h3>
       <div className="cast">
@@ -140,6 +152,7 @@ function Scene() {
         })}
       </div>
       <img src={scene ? scene.img : null} onClick={placeGuess}></img>
+      {guessing ? <CharacterForm icons={icons} finds={finds} coords={coords}/> : ''}
     </div>
   )
 }
