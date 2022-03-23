@@ -1,4 +1,4 @@
-import { collection, doc, getDoc, getDocs } from "firebase/firestore"
+import { collection, doc, getDoc, getDocs, setDoc } from "firebase/firestore"
 import { useEffect, useState } from 'react';
 import { db } from './App.js'
 
@@ -10,7 +10,7 @@ function Scene(props) {
   const [locations, setLocations] = useState([]);
   const [finds, setFinds] = useState([]);
   const [seconds, setSeconds] = useState(0);
-  const [isActive, setIsActive] = useState(true);
+  const [isActive, setIsActive] = useState(false);
 
   useEffect(() => {
     if (!scene) {
@@ -31,9 +31,22 @@ function Scene(props) {
     else if (!isActive && seconds !== 0) {
       clearInterval(interval);
     }
-    
+
     return () => clearInterval(interval);
   }, [isActive, seconds])
+
+  useEffect(() => {
+    if (locations.length > 0) {
+      setIsActive(true)
+    }
+  }, [locations])
+
+  useEffect(() => {
+    if(isActive && checkWin()) {
+      setIsActive(false);
+      enterScore();
+    }
+  }, [finds])
 
   function placeGuess(e) {
 
@@ -53,9 +66,6 @@ function Scene(props) {
           console.log('correct');
           if (!finds.includes(name)) {
             setFinds([...finds, name]);
-            if (checkWin()) {
-              //enterScore();
-            }
           }
         }
         else {
@@ -66,15 +76,23 @@ function Scene(props) {
   }
 
   function checkWin() {
+    console.log(finds)
     if (locations.length === finds.length) {
-      return true;
+      console.log('win!');
     }
-    return false
   }
 
+  function enterScore() {
+    let name = prompt('name?');
+    ( async() => {
+      await setDoc(doc(db, 'leaderboard', id), {
+        scene: id,
+        name: name,
+        time: seconds
+      })  
+    })()  
+  }
   
-  const start = new Date()
-  console.log(start)
   const id = window.location.pathname.split('/').slice(-1)[0];
 
   async function getScene(id) {
