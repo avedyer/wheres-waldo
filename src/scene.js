@@ -2,15 +2,24 @@ import { collection, doc, getDoc, getDocs, setDoc } from "firebase/firestore"
 import { useEffect, useState } from 'react';
 import { db } from './App.js'
 
+import waldo from './imgs/waldo.jpg'
+import wenda from './imgs/wenda.jpg'
+import odlaw from './imgs/odlaw.jpg'
+import wizard from './imgs/wizard.gif'
 
-
-function Scene(props) {
-
+function Scene() {
   const [scene, setScene] = useState();
   const [locations, setLocations] = useState([]);
   const [finds, setFinds] = useState([]);
-  const [seconds, setSeconds] = useState(0);
+  const [time, setTime] = useState(0);
   const [isActive, setIsActive] = useState(false);
+
+  const icons = [
+    {name: 'Waldo', src: waldo},
+    {name: 'Wenda', src: wenda},
+    {name: 'Odlaw', src: odlaw},
+    {name: 'Wizard', src: wizard},
+  ]
 
   useEffect(() => {
     if (!scene) {
@@ -25,15 +34,15 @@ function Scene(props) {
     let interval = null;
     if (isActive) {
       interval = setInterval(() => {
-        setSeconds(seconds => seconds + 1);
+        setTime(time => time + 1);
       }, 1000);
     } 
-    else if (!isActive && seconds !== 0) {
+    else if (!isActive && time !== 0) {
       clearInterval(interval);
     }
 
     return () => clearInterval(interval);
-  }, [isActive, seconds])
+  }, [isActive, time])
 
   useEffect(() => {
     if (locations.length > 0) {
@@ -43,6 +52,7 @@ function Scene(props) {
 
   useEffect(() => {
     if(isActive && checkWin()) {
+      console.log('entering score')
       setIsActive(false);
       enterScore();
     }
@@ -79,7 +89,9 @@ function Scene(props) {
     console.log(finds)
     if (locations.length === finds.length) {
       console.log('win!');
+      return true
     }
+    return false
   }
 
   function enterScore() {
@@ -88,9 +100,18 @@ function Scene(props) {
       await setDoc(doc(db, 'leaderboard', id), {
         scene: id,
         name: name,
-        time: seconds
+        time: time
       })  
     })()  
+  }
+
+  function clockTime(time) {
+    let minutes = Math.floor(time / 60);
+    let hours = Math.floor(minutes / 60);
+    let seconds = time % 60;
+    minutes = minutes % 60;
+
+    return `${hours}:${minutes > 9 ? minutes : `0${minutes}`}:${seconds > 9 ? seconds : `0${seconds}`}`;
   }
   
   const id = window.location.pathname.split('/').slice(-1)[0];
@@ -112,7 +133,12 @@ function Scene(props) {
   return (
     <div className="scene">
       <h1>{scene ? scene.title : 'loading...'}</h1>
-      <h3>{seconds}</h3>
+      <h3>{clockTime(time)}</h3>
+      <div className="cast">
+        {icons.map((icon) => {
+          return <img src={icon.src} className={`icon ${finds.includes(icon.name) ? 'found' : ''}`}/>
+        })}
+      </div>
       <img src={scene ? scene.img : null} onClick={placeGuess}></img>
     </div>
   )
