@@ -27,6 +27,9 @@ function Home(props) {
           {scene.data.title}
         </Link>
       )}
+      <Link to={'/leaderboard'} >
+        Leaderboard
+      </Link>
     </div>
   )
 }

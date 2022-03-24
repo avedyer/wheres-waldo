@@ -7,6 +7,7 @@ import wenda from './imgs/wenda.jpg'
 import odlaw from './imgs/odlaw.jpg'
 import wizard from './imgs/wizard.gif'
 import CharacterForm from "./characterForm.js";
+import Leaderboard from "./leaderboard.js";
 
 function Scene() {
   const [scene, setScene] = useState();
@@ -16,6 +17,8 @@ function Scene() {
   const [isActive, setIsActive] = useState(false);
   const [guessing, setIsGuessing] = useState(false)
   const [coords, setCoords] = useState([])
+  const [offsetCoords, setOffsetCoords] = useState([])
+  const [guess, setGuess] = useState();
 
   const icons = [
     {name: 'Waldo', src: waldo},
@@ -54,15 +57,25 @@ function Scene() {
   }, [locations])
 
   useEffect(() => {
+    checkGuess(coords, guess)
+  }, [guess])
+
+  useEffect(() => {
     if(isActive && checkWin()) {
-      console.log('entering score')
       setIsActive(false);
       enterScore();
     }
   }, [finds])
 
-  function clickCoords(e) {
-    return [e.clientX, e.clientY];
+  function checkGuess(coords, name) {
+    for (let location of locations) {
+      if (location.name === name &&
+        Math.abs(coords[0] - location.coords[0]) < 30 &&
+        !finds.includes(name)) {
+            setFinds([...finds, name]);
+      }
+    }
+    setIsGuessing(false)
   }
 
   function placeGuess(e) {
@@ -79,28 +92,15 @@ function Scene() {
     let offsetY = e.target.offsetTop - window.scrollY;
 
     let coords = [Math.floor(e.clientX - offsetX), Math.floor(e.clientY - offsetY)]
-    let name = prompt('name?');
+    setOffsetCoords(coords);
+  }
 
-    for (let location of locations) {
-      if (location.name === name) {
-        if (Math.abs(coords[0] - location.coords[0]) < 30) {
-          console.log('correct');
-          if (!finds.includes(name)) {
-            setFinds([...finds, name]);
-          }
-        }
-        else {
-          console.log('incorrect');
-        }
-      }
-    }
-    setIsGuessing(false)
+  function passGuess(name) {
+    setGuess(name);
   }
 
   function checkWin() {
-    console.log(finds)
     if (locations.length === finds.length) {
-      console.log('win!');
       return true
     }
     return false
@@ -108,13 +108,14 @@ function Scene() {
 
   function enterScore() {
     let name = prompt('name?');
-    ( async() => {
-      await setDoc(doc(db, 'leaderboard', id), {
+    ( async(name) => {
+      const sceneRef = doc(db, 'leaderboard', id);
+      await setDoc(doc(sceneRef, 'scores', name), {
         scene: id,
         name: name,
         time: time
       })  
-    })()  
+    })(name)  
   }
 
   function clockTime(time) {
@@ -152,7 +153,7 @@ function Scene() {
         })}
       </div>
       <img src={scene ? scene.img : null} onClick={placeGuess}></img>
-      {guessing ? <CharacterForm icons={icons} finds={finds} coords={coords}/> : ''}
+      {guessing ? <CharacterForm icons={icons} finds={finds} coords={offsetCoords} passGuess={passGuess}/> : ''}
     </div>
   )
 }
