@@ -71,11 +71,21 @@ function Leaderboard() {
       </div>
       <div className='scene'>
         {selection ? 
-          <ul>
-            {selection.scores ? selection.scores.map(score =>
-            <li>{`${score.name}: ${score.time}s`}</li>
+          <table>
+            <tr>
+              <th>Name</th>
+              <th>Time</th>
+            </tr>
+            {selection.scores ? selection.scores.map(score =>{
+              return(
+                <tr>
+                  <td>{score.name}</td>
+                  <td>{score.time}s</td>
+                </tr>
+              )
+            }
             ) : 'loading...'}
-          </ul>
+          </table>
           : 'loading...'}
       </div>
     </div>
