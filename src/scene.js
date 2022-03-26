@@ -111,7 +111,6 @@ function Scene() {
     ( async(name) => {
       const sceneRef = doc(db, 'leaderboard', id);
       await setDoc(doc(sceneRef, 'scores', name), {
-        scene: id,
         name: name,
         time: time
       })  
