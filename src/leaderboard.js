@@ -5,6 +5,7 @@ import { db } from './App.js'
 function Leaderboard() {
   const [scenes, setScenes] = useState([]);
   const [boards, setBoards] = useState([]);
+  const [selection, setSelection] = useState();
 
   useEffect(() => {
     if (scenes.length === 0) {
@@ -17,6 +18,12 @@ function Leaderboard() {
       getBoards(scenes);
     }
   }, [scenes]);
+
+  useEffect(() => {
+    if (!selection) {
+      setSelection(boards[0])
+    }
+  }, [boards])
 
   async function getScenes(db) {
     const scenesCollection = collection(db, 'scenes');
@@ -36,7 +43,7 @@ function Leaderboard() {
       return board
     }))
     boardList.forEach(board => board.scores = sortScores(board.scores).slice(0))
-    setBoards(boardList)
+    setBoards(boardList);
   }
 
   function sortScores(scores) {
@@ -54,16 +61,23 @@ function Leaderboard() {
 
   return(
     <div className="leaderboard">
-      {boards.length > 0 ? boards.map((board) => {
-        return(<div className='scene'>
-          <h2>{board.title}</h2>
+      <div className='options'>
+        {boards.length > 0 ?
+          boards.map((board) => {
+            return(
+              <h3 onClick={() => {setSelection(board)}}>{board.title}</h3>
+            )
+          }): ''}
+      </div>
+      <div className='scene'>
+        {selection ? 
           <ul>
-            {board.scores.map(score =>
+            {selection.scores ? selection.scores.map(score =>
             <li>{`${score.name}: ${score.time}s`}</li>
-            )}
-            </ul>
-        </div>)
-      }) : 'loading...'}
+            ) : 'loading...'}
+          </ul>
+          : 'loading...'}
+      </div>
     </div>
   )
 }

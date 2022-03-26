@@ -15,3 +15,8 @@
   position: absolute;
   background-color: red;
 }
+
+.frame img {
+  width: 300px;
+  height: 200px;
+}

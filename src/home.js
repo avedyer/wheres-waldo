@@ -22,14 +22,16 @@ function Home(props) {
 
   return(
     <div className="home">
+      <div className='scene-list'>
       {scenes.map((scene) =>
         <Link to={`/scene/${scene.id}`}>
-          {scene.data.title}
+          <div className='frame'>
+            <h3>{scene.data.title}</h3>
+            <img src={scene.data.img} />
+          </div>
         </Link>
       )}
-      <Link to={'/leaderboard'} >
-        Leaderboard
-      </Link>
+      </div>
     </div>
   )
 }

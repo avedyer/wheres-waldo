@@ -9,6 +9,7 @@ import Scene from "./scene.js"
 import Home from './home.js'
 import './App.css';
 import Leaderboard from './leaderboard.js';
+import Header from './header.js';
 
 
 const firebaseConfig = {
@@ -33,6 +34,7 @@ function App() {
   return(
     <div className='App'>
       <BrowserRouter>
+        <Header />
         <Routes>
           <Route path='/' element={<Home db={db}/>}/>
           <Route path='/leaderboard' element={<Leaderboard />} />
@@ -41,16 +43,6 @@ function App() {
       </BrowserRouter>
     </div>
   )
-
-  /*
-  return (
-    <div className="App">
-      {scenes.map((scene) => 
-        <Scene data={scenes.length > 0 ? scene.data : null} id={scenes.length > 0 ? scene.id : null} db={db}/>
-      )}
-    </div>
-  );
-  */
 }
 
 export { db, App }
