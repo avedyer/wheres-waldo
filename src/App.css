@@ -1,13 +1,63 @@
+/* GLOBAL */
+
+* {
+  text-align: center;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+a:hover {
+  text-decoration: underline;
+}
+
+/* HEADER */
+
+header {
+  margin-bottom: 48px;
+}
+
+#logo {
+  margin: 12px auto 24px auto;
+}
+
+nav {
+  width: 30%;
+  margin: auto;
+  display: flex;
+  justify-content: space-evenly;
+  font-size: 20px;
+}
+
+/* HOMEPAGE */
+
+#scene-list {
+  display: flex;
+  justify-content: space-evenly;
+}
+
+.frame img {
+  width: 480px;
+  height: 360px;
+  border-radius: 24px;
+}
+
+/* GAME */
+
 .icon {
   width: 64px;
   height: 64px;
+  object-fit: cover;
+  object-position: top;
 }
 
 .found{
   opacity: 60%;
 }
 
-#scene {
+#game {
   position: relative;
 }
 
@@ -16,7 +66,57 @@
   background-color: red;
 }
 
-.frame img {
-  width: 300px;
-  height: 200px;
+#scene {
+  width: 80vw;
+  height: auto;
+}
+
+/* LEADERBOARD */
+
+.leaderboard .options {
+  display: flex;
+  justify-content: center;
+  margin: auto;
+}
+
+.leaderboard .title { 
+  margin: auto 24px;
+  font-size: 24px;
+}
+
+.options .title:hover {
+  color: hsl(0, 0%, 40%)
+}
+
+.title.selected {
+  text-decoration: underline;
+}
+
+.scores {
+  width: 30%;
+  margin: auto;
+}
+
+.scores table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 24px;
+}
+
+.scores table th {
+  font-size: 20px;
+  height: 3em;
+}
+
+.scores table * {
+  text-align: left;
+}
+
+.scores table tr {
+  height: 2em;
+  font-size: 18px
+}
+
+.scores table tr:nth-child(even) {
+  background-color: hsl(0, 0%, 90%);
 }

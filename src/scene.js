@@ -148,9 +148,13 @@ function Scene() {
     setLocations(locationsList);
   }
 
+  function closeForm() {
+    setIsGuessing(false);
+  }
+
   if(validScene) {
     return (
-    <div id="scene">
+    <div id="game">
       <h1>{scene ? scene.title : 'loading...'}</h1>
       <h3>{clockTime(time)}</h3>
       <div className="cast">
@@ -158,8 +162,8 @@ function Scene() {
           return <img src={icon.src} className={`icon ${finds.includes(icon.name) ? 'found' : ''}`}/>
         })}
       </div>
-      <img src={scene ? scene.img : null} onClick={placeGuess}></img>
-      {guessing ? <CharacterForm icons={icons} finds={finds} coords={offsetCoords} passGuess={passGuess}/> : ''}
+      <img id="scene" src={scene ? scene.img : null} onClick={placeGuess}></img>
+      {guessing ? <CharacterForm icons={icons} finds={finds} coords={offsetCoords} closeForm={closeForm} passGuess={passGuess}/> : ''}
     </div>
     )
   }

@@ -21,8 +21,9 @@ function Home(props) {
   }
 
   return(
-    <div className="home">
-      <div className='scene-list'>
+    <div id="home">
+      <h2>Play:</h2>
+      <div id='scene-list'>
       {scenes.map((scene) =>
         <Link to={`/scene/${scene.id}`}>
           <div className='frame'>

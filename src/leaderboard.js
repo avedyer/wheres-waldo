@@ -62,14 +62,14 @@ function Leaderboard() {
   return(
     <div className="leaderboard">
       <div className='options'>
-        {boards.length > 0 ?
+        {selection ?
           boards.map((board) => {
             return(
-              <h3 onClick={() => {setSelection(board)}}>{board.title}</h3>
+              <h3 className={`title ${selection.id === board.id ? 'selected' : ''}`} onClick={() => {setSelection(board)}}>{board.title}</h3>
             )
           }): ''}
       </div>
-      <div className='scene'>
+      <div className='scores'>
         {selection ? 
           <table>
             <tr>
