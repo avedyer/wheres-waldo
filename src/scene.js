@@ -19,6 +19,7 @@ function Scene() {
   const [coords, setCoords] = useState([])
   const [offsetCoords, setOffsetCoords] = useState([])
   const [guess, setGuess] = useState();
+  const [validScene, setValidScene] = useState(true);
 
   const icons = [
     {name: 'Waldo', src: waldo},
@@ -131,7 +132,12 @@ function Scene() {
   async function getScene(id) {
     const docRef = doc(db, 'scenes', id);
     const sceneSnapshot = await getDoc(docRef);
-    setScene(sceneSnapshot.data())
+    if(!sceneSnapshot.data()) {
+      setValidScene(false);
+    }
+    else{
+      setScene(sceneSnapshot.data())
+    }
   }
 
   async function getLocations(id) {
@@ -142,7 +148,8 @@ function Scene() {
     setLocations(locationsList);
   }
 
-  return (
+  if(validScene) {
+    return (
     <div id="scene">
       <h1>{scene ? scene.title : 'loading...'}</h1>
       <h3>{clockTime(time)}</h3>
@@ -154,7 +161,15 @@ function Scene() {
       <img src={scene ? scene.img : null} onClick={placeGuess}></img>
       {guessing ? <CharacterForm icons={icons} finds={finds} coords={offsetCoords} passGuess={passGuess}/> : ''}
     </div>
-  )
+    )
+  }
+  else {
+    return (
+      <h1 className="Error">
+        Error: invalid url
+      </h1>
+    )
+  }
 }
 
 export default Scene
