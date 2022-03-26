@@ -35,7 +35,13 @@ function Leaderboard() {
       }
       return board
     }))
+    boardList.forEach(board => board.scores = sortScores(board.scores).slice(0))
     setBoards(boardList)
+  }
+
+  function sortScores(scores) {
+    let sortedScores = scores.sort((a, b) => a.time - b.time);
+    return sortedScores
   }
 
   async function listScores(scene) {
