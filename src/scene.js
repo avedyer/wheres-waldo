@@ -8,6 +8,7 @@ import odlaw from './imgs/odlaw.jpg'
 import wizard from './imgs/wizard.gif'
 import CharacterForm from "./characterForm.js";
 import Leaderboard from "./leaderboard.js";
+import ScoreForm from "./scoreForm.js";
 
 function Scene() {
   const [scene, setScene] = useState();
@@ -26,6 +27,7 @@ function Scene() {
     {name: 'Odlaw', src: odlaw},
     {name: 'Wizard', src: wizard},
   ])
+  const [won, setWon] = useState(false)
   
   useEffect(() => {
     if (!scene) {
@@ -71,7 +73,7 @@ function Scene() {
   useEffect(() => {
     if(isActive && checkWin()) {
       setIsActive(false);
-      enterScore();
+      setWon(true)
     }
   }, [finds])
 
@@ -122,8 +124,7 @@ function Scene() {
     return false
   }
 
-  function enterScore() {
-    let name = prompt('name?');
+  function enterScore(name) {
     ( async(name) => {
       const sceneRef = doc(db, 'leaderboard', id);
       await setDoc(doc(sceneRef, 'scores', name), {
@@ -183,6 +184,7 @@ function Scene() {
         <img id="scene" src={scene ? scene.img : null} onClick={placeGuess}></img>
       </div>
       {guessing ? <CharacterForm icons={icons} finds={finds} coords={offsetCoords} closeForm={closeForm} passGuess={passGuess}/> : ''}
+      {won ? <ScoreForm enterScore={enterScore} /> : ''}
     </div>
     )
   }
