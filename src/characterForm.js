@@ -1,8 +1,10 @@
 function CharacterForm(props) {
   return(
     <div className="character-form" style={{left: props.coords[0], top: props.coords[1]}}>
-      <p>character?</p>
-      <button onClick={() => props.closeForm()}>x</button>
+      <div className='top'>
+        <p>Character?</p>
+        <button onClick={() => props.closeForm()}>X</button>
+      </div>
       {props.icons.map((icon) => {
           return (
           <img 

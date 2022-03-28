@@ -16,18 +16,17 @@ function Scene() {
   const [time, setTime] = useState(0);
   const [isActive, setIsActive] = useState(false);
   const [guessing, setIsGuessing] = useState(false)
-  const [coords, setCoords] = useState([])
   const [offsetCoords, setOffsetCoords] = useState([])
+  const [percentCoords, setPercentCoords] = useState([])
   const [guess, setGuess] = useState();
   const [validScene, setValidScene] = useState(true);
-
-  const icons = [
+  const [icons, setIcons] = useState([
     {name: 'Waldo', src: waldo},
     {name: 'Wenda', src: wenda},
     {name: 'Odlaw', src: odlaw},
     {name: 'Wizard', src: wizard},
-  ]
-
+  ])
+  
   useEffect(() => {
     if (!scene) {
       getScene(id);
@@ -53,12 +52,20 @@ function Scene() {
 
   useEffect(() => {
     if (locations.length > 0) {
+      let names = locations.map(location => location.name);
+      let trimIcons = []
       setIsActive(true)
+      icons.forEach((icon) => {
+        if(names.includes(icon.name)) {
+          trimIcons.push(icon)
+        }
+      })
+      setIcons(trimIcons.splice(0))
     }
   }, [locations])
 
   useEffect(() => {
-    checkGuess(coords, guess)
+    checkGuess(percentCoords, guess)
   }, [guess])
 
   useEffect(() => {
@@ -68,10 +75,20 @@ function Scene() {
     }
   }, [finds])
 
+
+  function getOffset(el) {
+    const rect = el.getBoundingClientRect();
+    return {
+      left: rect.left,
+      top: rect.top
+    };
+  }
+
   function checkGuess(coords, name) {
     for (let location of locations) {
       if (location.name === name &&
-        Math.abs(coords[0] - location.coords[0]) < 30 &&
+        Math.abs(coords[0] - location.coords[0]) < .03 &&
+        Math.abs(coords[1] - location.coords[1]) < .03 &&
         !finds.includes(name)) {
             setFinds([...finds, name]);
       }
@@ -87,12 +104,10 @@ function Scene() {
 
     setIsGuessing(true);
 
-    setCoords([e.clientX, e.clientY])
-
-    let offsetX = e.target.offsetLeft - window.scrollX;
-    let offsetY = e.target.offsetTop - window.scrollY;
-
-    let coords = [Math.floor(e.clientX - offsetX), Math.floor(e.clientY - offsetY)]
+    let offset = getOffset(document.getElementById('scene'));
+    let size = [e.target.width, e.target.height];
+    let coords = [Math.floor(e.clientX - offset.left), Math.floor(e.clientY - offset.top)];
+    setPercentCoords([(coords[0]/size[0]), (coords[1]/size[1])])
     setOffsetCoords(coords);
   }
 
@@ -156,13 +171,17 @@ function Scene() {
     return (
     <div id="game">
       <h1>{scene ? scene.title : 'loading...'}</h1>
-      <h3>{clockTime(time)}</h3>
-      <div className="cast">
-        {icons.map((icon) => {
-          return <img src={icon.src} className={`icon ${finds.includes(icon.name) ? 'found' : ''}`}/>
-        })}
+      <div className='info'>
+        <h3>{clockTime(time)}</h3>
+        <div className="cast">
+          {icons.map((icon) => 
+              <img src={icon.src} className={`icon ${finds.includes(icon.name) ? 'found' : ''}`}/>
+          )}
+        </div>
       </div>
-      <img id="scene" src={scene ? scene.img : null} onClick={placeGuess}></img>
+      <div>
+        <img id="scene" src={scene ? scene.img : null} onClick={placeGuess}></img>
+      </div>
       {guessing ? <CharacterForm icons={icons} finds={finds} coords={offsetCoords} closeForm={closeForm} passGuess={passGuess}/> : ''}
     </div>
     )
