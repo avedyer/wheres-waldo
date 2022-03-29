@@ -2,6 +2,10 @@ import { useEffect, useState } from 'react';
 
 function ScoreForm(props) {
 
+  //Returns a form for submitting a high score.
+  //submitted state variable is used to prevent duplicate submissions
+  //Function for sending data to firestore is passed as a prop
+
   const [name, setName] = useState()
   const [submitted, setSubmitted] = useState(false)
 

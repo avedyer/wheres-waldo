@@ -1,4 +1,8 @@
 function CharacterForm(props) {
+
+  //Returns a form for choosing which character the user is identifying
+  //Props contain character data
+
   return(
     <div className="character-form" style={{left: props.coords[0], top: props.coords[1]}}>
       <div className='top'>

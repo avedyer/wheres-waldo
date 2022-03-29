@@ -1,9 +1,8 @@
-import { useEffect, useState } from 'react';
 import { Routes, Route, BrowserRouter } from "react-router-dom";
 
 import { initializeApp } from "firebase/app";
 import { getAnalytics } from "firebase/analytics";
-import { collection, getDocs, getFirestore } from "firebase/firestore"
+import { getFirestore } from "firebase/firestore"
 
 import Scene from "./scene.js"
 import Home from './home.js'

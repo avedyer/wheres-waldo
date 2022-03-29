@@ -13,6 +13,8 @@ function Home(props) {
     }
   }, []);
 
+  //Pull scene data from Firestore
+
   async function getScenes(db) {
     const scenesCollection = collection(db, 'scenes');
     const scenesSnapshot = await getDocs(scenesCollection);

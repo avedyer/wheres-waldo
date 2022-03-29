@@ -6,11 +6,17 @@ import waldo from './imgs/waldo.jpg'
 import wenda from './imgs/wenda.jpg'
 import odlaw from './imgs/odlaw.jpg'
 import wizard from './imgs/wizard.gif'
+
 import CharacterForm from "./characterForm.js";
-import Leaderboard from "./leaderboard.js";
 import ScoreForm from "./scoreForm.js";
 
 function Scene() {
+  /*
+    Returns a scene element with toggleable subcomponents for submitting guesses and scores.
+    Scene and character data is pulled from firestore.
+    CharacterForm for submitting guesses and ScoreForm for submitting scores are displayed based on state variables defining the current status of the game.
+  */
+
   const [scene, setScene] = useState();
   const [locations, setLocations] = useState([]);
   const [finds, setFinds] = useState([]);
@@ -28,7 +34,9 @@ function Scene() {
     {name: 'Wizard', src: wizard},
   ])
   const [won, setWon] = useState(false)
+
   
+
   useEffect(() => {
     if (!scene) {
       getScene(id);
@@ -37,6 +45,8 @@ function Scene() {
       }
     }
   }, []);
+
+  //Timer function, activates upon loading of scene data
 
   useEffect(() => {
     let interval = null;
@@ -51,6 +61,8 @@ function Scene() {
 
     return () => clearInterval(interval);
   }, [isActive, time])
+
+  //Removes icons for characters who are not in the scene
 
   useEffect(() => {
     if (locations.length > 0) {
@@ -77,6 +89,45 @@ function Scene() {
     }
   }, [finds])
 
+  const id = window.location.pathname.split('/').slice(-1)[0]; //id of scene within database is passed to the Scene element through the url
+
+  //Checks for valid scene id and passes it to state
+
+  async function getScene(id) {
+    const docRef = doc(db, 'scenes', id);
+    const sceneSnapshot = await getDoc(docRef);
+    if(!sceneSnapshot.data()) {
+      setValidScene(false);
+    }
+    else{
+      setScene(sceneSnapshot.data())
+    }
+  }
+
+  //Fetches character locations from particular scene
+
+  async function getLocations(id) {
+    const docRef = doc(db, 'scenes', id);
+    const locationsCollection = collection(docRef, 'locations');
+    const locationsSnapshot = await getDocs(locationsCollection);
+    const locationsList = locationsSnapshot.docs.map(doc => {return {name: doc.data().name, coords: doc.data().coords}});
+    setLocations(locationsList);
+  }
+
+  function closeForm() {
+    setIsGuessing(false);
+  }
+
+  //Converts number of seconds to HH:MM:SS format
+
+  function clockTime(time) {
+    let minutes = Math.floor(time / 60);
+    let hours = Math.floor(minutes / 60);
+    let seconds = time % 60;
+    minutes = minutes % 60;
+
+    return `${hours}:${minutes > 9 ? minutes : `0${minutes}`}:${seconds > 9 ? seconds : `0${seconds}`}`;
+  }
 
   function getOffset(el) {
     const rect = el.getBoundingClientRect();
@@ -86,17 +137,13 @@ function Scene() {
     };
   }
 
-  function checkGuess(coords, name) {
-    for (let location of locations) {
-      if (location.name === name &&
-        Math.abs(coords[0] - location.coords[0]) < .03 &&
-        Math.abs(coords[1] - location.coords[1]) < .03 &&
-        !finds.includes(name)) {
-            setFinds([...finds, name]);
-      }
-    }
-    setIsGuessing(false)
+  //Retrieves guess data from pop-up form
+
+  function passGuess(name) {
+    setGuess(name);
   }
+
+  //Defines guess in terms of ratio between the location of the user's click and the total size of the image on a 0 to 1 scale.
 
   function placeGuess(e) {
 
@@ -113,16 +160,25 @@ function Scene() {
     setOffsetCoords(coords);
   }
 
-  function passGuess(name) {
-    setGuess(name);
+  //Compares user guess against database info
+
+  function checkGuess(coords, name) {
+    for (let location of locations) {
+      if (location.name === name &&
+        Math.abs(coords[0] - location.coords[0]) < .03 &&
+        Math.abs(coords[1] - location.coords[1]) < .03 &&
+        !finds.includes(name)) {
+            setFinds([...finds, name]);
+      }
+    }
+    setIsGuessing(false)
   }
 
   function checkWin() {
-    if (locations.length === finds.length) {
-      return true
-    }
-    return false
+    return locations.length === finds.length
   }
+
+  //Pushes score data retrieved from pop-up form to database
 
   function enterScore(name) {
     ( async(name) => {
@@ -132,40 +188,6 @@ function Scene() {
         time: time
       })  
     })(name)  
-  }
-
-  function clockTime(time) {
-    let minutes = Math.floor(time / 60);
-    let hours = Math.floor(minutes / 60);
-    let seconds = time % 60;
-    minutes = minutes % 60;
-
-    return `${hours}:${minutes > 9 ? minutes : `0${minutes}`}:${seconds > 9 ? seconds : `0${seconds}`}`;
-  }
-  
-  const id = window.location.pathname.split('/').slice(-1)[0];
-
-  async function getScene(id) {
-    const docRef = doc(db, 'scenes', id);
-    const sceneSnapshot = await getDoc(docRef);
-    if(!sceneSnapshot.data()) {
-      setValidScene(false);
-    }
-    else{
-      setScene(sceneSnapshot.data())
-    }
-  }
-
-  async function getLocations(id) {
-    const docRef = doc(db, 'scenes', id);
-    const locationsCollection = collection(docRef, 'locations');
-    const locationsSnapshot = await getDocs(locationsCollection);
-    const locationsList = locationsSnapshot.docs.map(doc => {return {name: doc.data().name, coords: doc.data().coords}});
-    setLocations(locationsList);
-  }
-
-  function closeForm() {
-    setIsGuessing(false);
   }
 
   if(validScene) {
